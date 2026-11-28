@@ -27,9 +27,14 @@ public sealed class ReplayVideoScheduler : BackgroundService
     private readonly ILogger<ReplayVideoScheduler> _logger;
     private readonly bool _actif;
     private readonly TimeSpan _repos;
+    private readonly TimeSpan _calmeStation;
+    private readonly ISessionsOuvertes? _sessions;
     private readonly TimeSpan _intervalle;
     private readonly TimeSpan _rienAFilmer;
     private readonly TimeSpan _sansRole;
+
+    /// <summary>Minutes de calme exigees d'une station avant un rendu (cle <c>Video:Render:StationCalmMinutes</c>).</summary>
+    internal const int CalmeParDefautMinutes = 5;
 
     private readonly object _verrou = new();
     private readonly SemaphoreSlim _reveil = new(0, 1);
@@ -41,13 +46,17 @@ public sealed class ReplayVideoScheduler : BackgroundService
     private string? _role;
 
     public ReplayVideoScheduler(IEventBus bus, ReplayVideoPublisher publication, ReplayPlaybackService playback,
-        IConfiguration configuration, ILogger<ReplayVideoScheduler> logger)
+        IConfiguration configuration, ILogger<ReplayVideoScheduler> logger, ISessionsOuvertes? sessions = null)
     {
+        _sessions = sessions;
         _bus = bus; _publication = publication; _playback = playback; _logger = logger;
         _actif = configuration.GetValue("Video:Render:Enabled", true);
         // LA BORNE DU JOUEUR REND SES RECORDS AU REPOS (decision du user du 09/11) : elle s'eteint souvent peu apres la
         // partie, le repos passe de 15 a 3 minutes ; le moindre jeu lance, la moindre touche, manette comprise, arrete le rendu.
         _repos = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:IdleMinutes", 3)));
+        // UNE STATION NE FILME QU'APRES QUELQUES MINUTES DE CALME (decision du user du 28/11) : sans jeu et sans navigation
+        // dans ES, panneau, session MULTIPLAYER ou vocal depuis ce delai. 0 = filmer des qu'aucune partie ne tourne (ancien comportement).
+        _calmeStation = TimeSpan.FromMinutes(Math.Max(0, configuration.GetValue("Video:Render:StationCalmMinutes", CalmeParDefautMinutes)));
         // Un passage par minute : le repos se juge sur la borne, le site n'est appele qu'au repos.
         _intervalle = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:IntervalMinutes", 1)));
         _rienAFilmer = TimeSpan.FromMinutes(Math.Max(1, configuration.GetValue("Video:Render:NothingToDoMinutes", 60)));
@@ -56,12 +65,13 @@ public sealed class ReplayVideoScheduler : BackgroundService
 
     /// <summary>
     /// La borne peut-elle filmer maintenant ? Une station des qu'aucune partie, lecture ni emulateur ne tourne ;
-    /// une borne de joueur seulement au repos. Pur, pour etre teste.
+    /// une borne de joueur seulement au repos ; la station exige en plus <paramref name="calmeStation"/> sans activite
+    /// (null = aucun calme exige). Pur, pour etre teste.
     /// </summary>
     internal static bool PeutFilmer(string? role, DateTime maintenant, DateTime derniereActivite, TimeSpan repos,
-        bool partieEnCours, bool emulateurEnCours, bool lectureEnCours)
+        bool partieEnCours, bool emulateurEnCours, bool lectureEnCours, TimeSpan? calmeStation = null)
         => role == ReplayVideoPublisher.RoleStation
-            ? !partieEnCours && !emulateurEnCours && !lectureEnCours
+            ? AuRepos(maintenant, derniereActivite, calmeStation ?? TimeSpan.Zero, partieEnCours, emulateurEnCours, lectureEnCours)
             : AuRepos(maintenant, derniereActivite, repos, partieEnCours, emulateurEnCours, lectureEnCours);
 
     /// <summary>La borne est-elle au repos ? Pur, pour etre teste.</summary>
@@ -213,6 +223,12 @@ public sealed class ReplayVideoScheduler : BackgroundService
     /// <summary>Un passage : filme un record si le role et l'etat de la borne le permettent. Rend le delai avant le suivant.</summary>
     private async Task<TimeSpan> PasserAsync(CancellationToken stoppingToken)
     {
+        // Une session ouverte (salle, vocal) est une activite a chaque passage : le calme repart de zero a sa fin.
+        if (_sessions?.Occupation() is { } occupee)
+        {
+            lock (_verrou) _derniereActivite = DateTime.UtcNow;
+            _logger.LogDebug("Video : session ouverte ({Raison}), pas de rendu de station.", occupee);
+        }
         bool partie; DateTime activiteDeLaBorne; string? role;
         lock (_verrou) { partie = _partieEnCours; activiteDeLaBorne = _derniereActivite; role = _role; }
         var maintenant = DateTime.UtcNow;
@@ -221,7 +237,7 @@ public sealed class ReplayVideoScheduler : BackgroundService
         var lecture = _playback.GetState().State != "idle";
         // Role encore inconnu : on le demande des que la borne est libre, sans attendre le repos.
         var libre = role is null ? !partie && !emulateur && !lecture
-            : PeutFilmer(role, maintenant, activite, _repos, partie, emulateur, lecture);
+            : PeutFilmer(role, maintenant, activite, _repos, partie, emulateur, lecture, _calmeStation);
         if (!libre) return _intervalle;
 
         var liste = await _publication.ListerAsync(stoppingToken).ConfigureAwait(false);
@@ -230,10 +246,13 @@ public sealed class ReplayVideoScheduler : BackgroundService
             _logger.LogInformation("Video : role de cette borne pour les films : {Role}.", liste.Role);
         lock (_verrou) _role = liste.Role;
         if (liste.Role == ReplayVideoPublisher.RoleAucun) return _sansRole;
-        if (!PeutFilmer(liste.Role, maintenant, activite, _repos, partie, emulateur, lecture)) return _intervalle;
+        if (!PeutFilmer(liste.Role, maintenant, activite, _repos, partie, emulateur, lecture, _calmeStation)) return _intervalle;
         if (liste.Cibles.Count == 0) return _rienAFilmer;
 
         var station = liste.Role == ReplayVideoPublisher.RoleStation;
+        if (station)
+            _logger.LogInformation("Video : rendu de station retenu : calme depuis {Calme} s, {Exige} min exigees.",
+                (int)(maintenant - activite).TotalSeconds, _calmeStation.TotalMinutes);
         using var rendu = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
         lock (_verrou)
         {
@@ -293,6 +312,10 @@ public sealed class ReplayVideoScheduler : BackgroundService
                 case "ui.game.selected":
                 case "ui.system.selected":
                 case "panel.input.pressed":
+                // Une session MULTIPLAYER ou Adventure (invitation, selection, depart) et le vocal comptent aussi
+                // (ces evenements ne partent que sur un changement d'etat, jamais en battement).
+                case "multiplayer.state":
+                case "voice.state":
                     break;
                 default:
                     activite = false;

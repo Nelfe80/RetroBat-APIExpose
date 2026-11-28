@@ -38,6 +38,35 @@ public sealed class ReplayVideoSchedulerTests
     }
 
     [Fact]
+    public void Une_station_attend_ses_minutes_de_calme_apres_un_jeu_ou_une_navigation()
+    {
+        const string station = ReplayVideoPublisher.RoleStation;
+        var calme = TimeSpan.FromMinutes(ReplayVideoScheduler.CalmeParDefautMinutes);
+        Assert.Equal(5, ReplayVideoScheduler.CalmeParDefautMinutes);
+        // Le joueur vient de quitter un jeu ou de naviguer : pas de rendu.
+        Assert.False(ReplayVideoScheduler.PeutFilmer(station, Maintenant, Maintenant.AddSeconds(-30), Repos, false, false, false, calme));
+        Assert.False(ReplayVideoScheduler.PeutFilmer(station, Maintenant, Maintenant.AddMinutes(-4.9), Repos, false, false, false, calme));
+        // Cinq minutes de calme : le rendu part.
+        Assert.True(ReplayVideoScheduler.PeutFilmer(station, Maintenant, Maintenant.AddMinutes(-5), Repos, false, false, false, calme));
+        // Le calme ne dispense pas du reste : jeu, emulateur ou lecture en cours.
+        var longtemps = Maintenant.AddHours(-2);
+        Assert.False(ReplayVideoScheduler.PeutFilmer(station, Maintenant, longtemps, Repos, true, false, false, calme));
+        Assert.False(ReplayVideoScheduler.PeutFilmer(station, Maintenant, longtemps, Repos, false, true, false, calme));
+        Assert.False(ReplayVideoScheduler.PeutFilmer(station, Maintenant, longtemps, Repos, false, false, true, calme));
+        // Calme a zero : ancien comportement.
+        Assert.True(ReplayVideoScheduler.PeutFilmer(station, Maintenant, Maintenant, Repos, false, false, false, TimeSpan.Zero));
+    }
+
+    [Fact]
+    public void Le_clavier_ou_la_souris_repoussent_aussi_le_rendu_de_la_station()
+    {
+        const string station = ReplayVideoPublisher.RoleStation;
+        var calme = TimeSpan.FromMinutes(5);
+        var activite = ReplayVideoScheduler.DerniereActivite(Maintenant, Maintenant.AddHours(-1), TimeSpan.FromMinutes(1));
+        Assert.False(ReplayVideoScheduler.PeutFilmer(station, Maintenant, activite, Repos, false, false, false, calme));
+    }
+
+    [Fact]
     public void Une_borne_de_joueur_attend_le_repos()
     {
         const string joueur = ReplayVideoPublisher.RoleJoueur;
